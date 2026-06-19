@@ -99,6 +99,36 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .nav-toggle-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 18px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: none;
+        }
+
+        .nav-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        nav {
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        nav.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+
         nav ul {
             display: flex;
             list-style: none;
@@ -598,10 +628,11 @@
                     </div>
                 </div>
                 <div class="header-right">
+                    <button class="nav-toggle-btn" id="navToggleBtn" onclick="toggleNav()">↑</button>
                     <button class="language-toggle" onclick="toggleLanguage()">
                         <span class="lang-text">English</span>
                     </button>
-                    <nav>
+                    <nav id="mainNav">
                         <ul>
                             <li><a href="#home" class="nav-home">الرئيسية</a></li>
                             <li><a href="#games" class="nav-games">الألعاب</a></li>
@@ -1115,6 +1146,23 @@
                 toggleText.textContent = document.body.classList.contains('ar') ? '▼ إظهار المسابقات' : '▼ Show Competitions';
             } else {
                 toggleText.textContent = document.body.classList.contains('ar') ? '▲ إخفاء المسابقات' : '▲ Hide Competitions';
+            }
+        }
+
+        let navHidden = false;
+        function toggleNav() {
+            const nav = document.getElementById('mainNav');
+            const btn = document.getElementById('navToggleBtn');
+            
+            navHidden = !navHidden;
+            
+            if (navHidden) {
+                nav.classList.add('hidden');
+                btn.textContent = '↓';
+                btn.style.display = 'block';
+            } else {
+                nav.classList.remove('hidden');
+                btn.textContent = '↑';
             }
         }
     </script>

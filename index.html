@@ -116,12 +116,22 @@
             color: #667eea;
         }
 
+        .developer-credit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
         .hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 80px 0;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 0px;
             border-radius: 10px;
         }
 
@@ -605,6 +615,12 @@
         </div>
     </header>
 
+    <div class="developer-credit">
+        <div class="container">
+            <span class="dev-credit-text">تم التطوير من قِبل محمد النعيمي (Admin)</span>
+        </div>
+    </div>
+
     <main>
         <section class="hero" id="home">
             <div class="container">
@@ -881,6 +897,7 @@
     <script>
         const translations = {
             ar: {
+                'dev-credit': 'تم التطوير من قِبل محمد النعيمي (Admin)',
                 'nav-home': 'الرئيسية',
                 'nav-games': 'الألعاب',
                 'nav-competitions': 'المسابقات',
@@ -962,6 +979,7 @@
                 'footer-2': 'سيرفر ديسكورد آمن وممتع للاعبين من جميع أنحاء العالم',
             },
             en: {
+                'dev-credit': 'Developed by Muhammad Al-Nuaimi (Admin)',
                 'nav-home': 'Home',
                 'nav-games': 'Games',
                 'nav-competitions': 'Competitions',

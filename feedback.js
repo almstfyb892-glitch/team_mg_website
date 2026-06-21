@@ -2,7 +2,34 @@
 let feedbackList = JSON.parse(localStorage.getItem('feedbackList')) || [];
 let selectedRating = null;
 
-// تحديث عرض الملاحظات
+// قائمة الكلمات المحظورة
+const bannedWords = [
+    'سب', 'قذف', 'شتم', 'لعن', 'كلمة سيئة',
+    'http://', 'https://', 'www.', '.com', '.net', '.org',
+    'رابط', 'موقع', 'لينك'
+];
+
+// دالة للتحقق من الكلمات المحظورة
+function containsBannedWords(text) {
+    const lowerText = text.toLowerCase();
+    return bannedWords.some(word => lowerText.includes(word.toLowerCase()));
+}
+
+// دالة للحصول على اسم الحساب (يمكن تعديله حسب الحاجة)
+function getUserName() {
+    let userName = localStorage.getItem('userName');
+    if (!userName) {
+        userName = prompt('الرجاء إدخال اسم حسابك:');
+        if (userName && userName.trim()) {
+            localStorage.setItem('userName', userName.trim());
+        } else {
+            userName = 'مستخدم مجهول';
+        }
+    }
+    return userName;
+}
+
+// تحديث عرض الملاحظات (عرض أفقي)
 function updateFeedbackDisplay() {
     const feedbackListDiv = document.getElementById('feedbackList');
     
@@ -11,18 +38,24 @@ function updateFeedbackDisplay() {
         return;
     }
     
+    feedbackListDiv.style.display = 'flex';
+    feedbackListDiv.style.flexWrap = 'wrap';
+    feedbackListDiv.style.gap = '15px';
+    feedbackListDiv.style.alignItems = 'flex-start';
+    
     feedbackListDiv.innerHTML = feedbackList.map((feedback, index) => `
-        <div style="background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; flex: 1; min-width: 280px; max-width: 350px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                 <img src="badge-${feedback.rating}-${['terrible', 'poor', 'neutral', 'good', 'excellent'][feedback.rating-1]}.png" style="width: 50px; height: 50px; object-fit: contain;">
-                <div style="flex: 1; margin-left: 15px;">
-                    <p style="color: #333; margin: 0; word-break: break-word;">${feedback.text}</p>
-                    <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">${new Date(feedback.date).toLocaleString('ar-SA')}</p>
+                <div style="flex: 1;">
+                    <p style="color: #667eea; margin: 0; font-weight: bold; font-size: 14px;">👤 ${feedback.userName}</p>
+                    <p style="color: #999; font-size: 11px; margin: 3px 0 0 0;">${new Date(feedback.date).toLocaleString('ar-SA')}</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="editFeedback(${index})" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;">تعديل</button>
-                    <button onclick="deleteFeedback(${index})" style="background: #ff6b6b; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;">حذف</button>
-                </div>
+            </div>
+            <p style="color: #333; margin: 10px 0; word-break: break-word; font-size: 14px; line-height: 1.5;">${feedback.text}</p>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button onclick="editFeedback(${index})" style="background: #667eea; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; flex: 1;">تعديل</button>
+                <button onclick="deleteFeedback(${index})" style="background: #ff6b6b; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; flex: 1;">حذف</button>
             </div>
         </div>
     `).join('');
@@ -97,10 +130,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // التحقق من الكلمات المحظورة
+        if (containsBannedWords(text)) {
+            alert('⚠️ تحتوي الملاحظة على كلمات محظورة أو روابط غير مسموحة!\nالرجاء تعديل الملاحظة.');
+            return;
+        }
+        
+        // الحصول على اسم الحساب
+        const userName = getUserName();
+        
         // إضافة الملاحظة
         feedbackList.push({
             text: text,
             rating: selectedRating,
+            userName: userName,
             date: new Date().toISOString()
         });
         
@@ -116,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('selectedBadge').innerHTML = '<p style="color: #999; font-size: 14px;">اختر شعار التقييم</p>';
         badgeBtns.forEach(b => b.style.borderColor = '#ddd');
         
-        alert('شكراً على ملاحظتك!');
+        alert('✅ شكراً على ملاحظتك!');
     });
     
     // تحديث الملاحظات عند التحميل

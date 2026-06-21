@@ -39,12 +39,16 @@ function updateFeedbackDisplay() {
     }
     
     feedbackListDiv.style.display = 'flex';
-    feedbackListDiv.style.flexWrap = 'wrap';
+    feedbackListDiv.style.flexWrap = 'nowrap';
     feedbackListDiv.style.gap = '15px';
     feedbackListDiv.style.alignItems = 'flex-start';
+    feedbackListDiv.style.overflowX = 'auto';
+    feedbackListDiv.style.overflowY = 'hidden';
+    feedbackListDiv.style.scrollBehavior = 'smooth';
+    feedbackListDiv.style.paddingBottom = '10px';
     
     feedbackListDiv.innerHTML = feedbackList.map((feedback, index) => `
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; flex: 1; min-width: 280px; max-width: 350px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea; flex-shrink: 0; min-width: 300px; width: 300px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                 <img src="badge-${feedback.rating}-${['terrible', 'poor', 'neutral', 'good', 'excellent'][feedback.rating-1]}.png" style="width: 50px; height: 50px; object-fit: contain;">
                 <div style="flex: 1;">

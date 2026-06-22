@@ -1,3 +1,6 @@
+// متغيرات عامة
+let currentUserName = '';
+
 // إنشاء Modal للتعديل
 function createEditModal() {
     const modalHTML = `
@@ -93,16 +96,20 @@ function createEditModal() {
 }
 
 // فتح Modal التعديل
-function openEditModal(index) {
-    const feedback = feedbackList[index];
-    const currentUserName = localStorage.getItem('userName');
+function openEditModal(id) {
+    const feedback = feedbackList.find(f => f.id === id);
+    
+    if (!feedback) {
+        alert('❌ لم يتم العثور على الملاحظة');
+        return;
+    }
     
     if (feedback.userName !== currentUserName) {
         alert('❌ لا يمكنك تعديل ملاحظة شخص آخر!');
         return;
     }
     
-    editingIndex = index;
+    editingId = id;
     selectedRating = feedback.rating;
     selectedVisibility = feedback.visibility;
     
@@ -166,22 +173,10 @@ function saveEditedFeedback() {
         return;
     }
     
-    if (editingIndex !== null) {
-        const userName = feedbackList[editingIndex].userName;
-        
-        feedbackList[editingIndex] = {
-            text: text,
-            rating: selectedRating,
-            userName: userName,
-            visibility: selectedVisibility,
-            date: feedbackList[editingIndex].date,
-            editedDate: new Date().toISOString()
-        };
-        
-        localStorage.setItem('feedbackList', JSON.stringify(feedbackList));
-        updateFeedbackDisplay();
+    if (editingId !== null) {
+        updateFeedbackInFirebase(editingId, text, selectedRating, selectedVisibility);
+        editingId = null;
         closeEditModal();
-        alert('✅ تم تحديث الملاحظة!');
     }
 }
 

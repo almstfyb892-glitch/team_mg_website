@@ -35,7 +35,7 @@ function getUserName() {
 // دالة تحقق الأدمن
 function checkAdminPassword() {
     const password = prompt('أدخل كلمة السر للأدمن:');
-    if (password === '27490smhi') {
+    if (password === 'TeamMG@2024#SecureAdmin$789') {
         isAdminMode = true;
         alert('✅ تم تفعيل وضع الأدمن!');
         return true;
@@ -127,17 +127,21 @@ function editFeedback(index) {
         return;
     }
     
+    // تعيين القيم للتعديل
     document.getElementById('feedbackText').value = feedback.text;
     selectedRating = feedback.rating;
     selectedVisibility = feedback.visibility;
     editingIndex = index;
     
+    // تحديث العرض
     updateBadgeDisplay();
     updateVisibilityDisplay();
     
     // تمرير إلى أعلى الصفحة
-    document.getElementById('feedbackText').scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('feedbackText').focus();
+    setTimeout(() => {
+        document.getElementById('feedbackText').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('feedbackText').focus();
+    }, 100);
     
     alert('✏️ جاري تعديل الملاحظة - عدّل النص واضغط إرسال');
 }

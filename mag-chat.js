@@ -13,6 +13,42 @@ const suggestedQuestions = [
     '🌟 كيف أحصل على رتبة خاصة؟'
 ];
 
+// قاموس الردود الشامل
+const magResponses = {
+    'ألعاب': {
+        keywords: ['ألعاب', 'لعبة', 'games', 'game'],
+        response: '🎮 نحن نوفر ألعاب متنوعة:\n• روبلوكس\n• فري فاير\n• ببجي موبايل\n• ماين كرافت\n• وألعاب أخرى رائعة!\n\nاختر اللعبة التي تفضلها وانضم إلى فريقك! 🚀'
+    },
+    'انضم': {
+        keywords: ['انضم', 'أنضم', 'join', 'دخول', 'سيرفر'],
+        response: '👥 للانضمام إلى السيرفر:\n1. اضغط على زر "💬 انضم للسيرفر الآن"\n2. سيتم نقلك إلى ديسكورد\n3. وافق على الشروط\n4. اختر لعبتك المفضلة\n5. استمتع! 🎉'
+    },
+    'vip': {
+        keywords: ['vip', 'عضو', 'premium', 'اشتراك'],
+        response: '🏆 للحصول على عضوية VIP:\n• التبرع للسيرفر\n• النشاط المستمر\n• المشاركة في الفعاليات\n\nالأعضاء VIP يحصلون على:\n✨ رتبة خاصة\n✨ قنوات حصرية\n✨ مكافآت شهرية\n\nتواصل مع الإدارة للمزيد! 💎'
+    },
+    'إدارة': {
+        keywords: ['إدارة', 'admin', 'تواصل', 'support', 'مساعدة'],
+        response: '💬 للتواصل مع الإدارة:\n• قناة #support في السيرفر\n• رسالة خاصة للمسؤولين\n• البريد الإلكتروني الرسمي\n\nنحن هنا لمساعدتك 24/7! 🤝'
+    },
+    'قواعد': {
+        keywords: ['قواعد', 'rules', 'شروط', 'قانون'],
+        response: '🎯 قواعد السيرفر:\n1. احترم الجميع\n2. لا للسب والشتم\n3. لا للإزعاج\n4. لا للإعلانات\n5. استمتع واللعب بنزاهة\n\nاقرأ القناة #rules للتفاصيل الكاملة! ⚖️'
+    },
+    'رتبة': {
+        keywords: ['رتبة', 'rank', 'level', 'مستوى'],
+        response: '🌟 الحصول على رتبة خاصة:\n• النشاط المستمر في السيرفر\n• المشاركة في الفعاليات\n• مساعدة الأعضاء الجدد\n• الالتزام بالقواعد\n\nكلما زاد نشاطك، زادت رتبتك! 📈'
+    },
+    'مرحبا': {
+        keywords: ['مرحبا', 'hello', 'hi', 'السلام', 'صباح'],
+        response: '👋 مرحباً بك! أنا MAG، مساعدك الذكي في السيرفر.\n\nكيف يمكنني مساعدتك اليوم؟ 😊'
+    },
+    'شكرا': {
+        keywords: ['شكرا', 'شكراً', 'thanks', 'thank you'],
+        response: '😊 تشرفت! أنا هنا دائماً لمساعدتك.\n\nإذا كان لديك أسئلة أخرى، لا تتردد! 🚀'
+    }
+};
+
 // دالة التشفير البسيطة
 function encryptMessage(message) {
     return btoa(message); // Base64 Encoding
@@ -47,8 +83,10 @@ function createMagChat() {
                 box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
                 transition: all 0.3s;
                 position: relative;
+                background-image: url('mag-icon.png');
+                background-size: cover;
+                background-position: center;
             " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                🤖
             </button>
             <p style="text-align: center; margin-top: 8px; color: white; font-weight: bold; font-size: 12px;">MAG</p>
         </div>
@@ -224,12 +262,52 @@ async function sendMagMessage() {
     // حفظ الرسالة المشفرة
     saveMagMessage(message, 'user');
     
-    // محاكاة الرد من MAG
+    // إظهار مؤشر الكتابة
+    showTypingIndicator();
+    
+    // محاكاة التأخير قبل الرد
     setTimeout(() => {
+        removeTypingIndicator();
         const response = getMagResponse(message);
         addMagMessage(response, 'mag');
         saveMagMessage(response, 'mag');
-    }, 500);
+    }, 1000);
+}
+
+// إظهار مؤشر الكتابة
+function showTypingIndicator() {
+    const container = document.getElementById('magMessagesContainer');
+    
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'magTypingIndicator';
+    typingDiv.style.cssText = `
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 10px;
+    `;
+    
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `
+        background: #e8e8e8;
+        color: #333;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-size: 13px;
+    `;
+    
+    bubble.innerHTML = '🤖 جاري الكتابة <span style="animation: blink 1.4s infinite;">...</span>';
+    typingDiv.appendChild(bubble);
+    container.appendChild(typingDiv);
+    
+    container.scrollTop = container.scrollHeight;
+}
+
+// إزالة مؤشر الكتابة
+function removeTypingIndicator() {
+    const indicator = document.getElementById('magTypingIndicator');
+    if (indicator) {
+        indicator.remove();
+    }
 }
 
 // إضافة رسالة إلى الدردشة
@@ -253,6 +331,7 @@ function addMagMessage(message, sender) {
         word-wrap: break-word;
         font-size: 13px;
         line-height: 1.4;
+        white-space: pre-wrap;
     `;
     
     bubble.textContent = message;
@@ -265,22 +344,20 @@ function addMagMessage(message, sender) {
 
 // الحصول على رد من MAG
 function getMagResponse(userMessage) {
-    const responses = {
-        'ألعاب': '🎮 نحن نوفر ألعاب متنوعة: روبلوكس، فري فاير، ببجي موبايل، ماين كرافت وغيرها!',
-        'انضم': '👥 للانضمام إلى السيرفر، اضغط على زر "انضم للسيرفر الآن" في الأعلى!',
-        'VIP': '🏆 يمكنك الحصول على عضوية VIP من خلال التبرع أو النشاط المستمر!',
-        'إدارة': '💬 تواصل مع الإدارة عبر قناة #support في السيرفر!',
-        'قواعد': '🎯 اقرأ قواعد السيرفر في قناة #rules - احترم الجميع وتمتع!',
-        'رتبة': '🌟 احصل على رتبة خاصة بالنشاط والمشاركة المستمرة في السيرفر!',
-    };
+    const lowerMessage = userMessage.toLowerCase();
     
-    for (let key in responses) {
-        if (userMessage.includes(key)) {
-            return responses[key];
+    // البحث عن كلمات مفتاحية
+    for (let key in magResponses) {
+        const item = magResponses[key];
+        for (let keyword of item.keywords) {
+            if (lowerMessage.includes(keyword)) {
+                return item.response;
+            }
         }
     }
     
-    return '🤔 سؤال جيد! يمكنك التواصل مع الإدارة للحصول على إجابة أفضل. 😊';
+    // رد افتراضي
+    return '🤔 سؤال جيد! \n\nيمكنك:\n• اختيار من الأسئلة المقترحة\n• التواصل مع الإدارة في #support\n• زيارة قناة #help\n\nأنا هنا لمساعدتك! 😊';
 }
 
 // حفظ الرسالة المشفرة
@@ -311,6 +388,17 @@ function loadMagMessages() {
         });
     }
 }
+
+// إضافة CSS للرسوم المتحركة
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes blink {
+        0%, 20%, 50%, 80%, 100% { opacity: 1; }
+        40% { opacity: 0.5; }
+        60% { opacity: 0.7; }
+    }
+`;
+document.head.appendChild(style);
 
 // تهيئة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,7 +1,6 @@
-// تخزين الملاحظات
+// متغيرات التحكم
 let selectedRating = null;
 let selectedVisibility = 'public';
-let isAdminMode = false;
 let editingId = null;
 
 // قائمة الكلمات المحظورة
@@ -15,20 +14,6 @@ const bannedWords = [
 function containsBannedWords(text) {
     const lowerText = text.toLowerCase();
     return bannedWords.some(word => lowerText.includes(word.toLowerCase()));
-}
-
-// دالة تحقق الأدمن
-function checkAdminPassword() {
-    const password = prompt('أدخل كلمة السر للأدمن:');
-    if (password === 'TeamMG@2024#SecureAdmin$789') {
-        isAdminMode = true;
-        alert('✅ تم تفعيل وضع الأدمن!');
-        return true;
-    } else {
-        alert('❌ كلمة السر خاطئة!');
-        isAdminMode = false;
-        return false;
-    }
 }
 
 // تحديث عرض الشعار المختار
@@ -70,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             selectedRating = parseInt(this.getAttribute('data-rating'));
             
-            // تحديث الحدود
             badgeBtns.forEach(b => b.style.borderColor = '#ddd');
             this.style.borderColor = '#667eea';
             this.style.borderWidth = '3px';
@@ -103,19 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // التحقق من الكلمات المحظورة
         if (containsBannedWords(text)) {
             alert('⚠️ تحتوي الملاحظة على كلمات محظورة أو روابط غير مسموحة!\nالرجاء تعديل الملاحظة.');
             return;
         }
         
         if (editingId !== null) {
-            // تحديث ملاحظة موجودة
-            updateFeedbackInFirebase(editingId, text, selectedRating, selectedVisibility);
+            updateFeedbackInSupabase(editingId, text, selectedRating, selectedVisibility);
             editingId = null;
         } else {
-            // إضافة ملاحظة جديدة
-            addFeedbackToFirebase(text, selectedRating, selectedVisibility);
+            addFeedbackToSupabase(text, selectedRating, selectedVisibility);
         }
         
         // مسح النموذج

@@ -174,7 +174,7 @@ function saveEditedFeedback() {
     }
     
     if (editingId !== null) {
-        updateFeedbackInFirebase(editingId, text, selectedRating, selectedVisibility);
+        updateFeedbackInSupabase(editingId, text, selectedRating, selectedVisibility);
         editingId = null;
         closeEditModal();
     }

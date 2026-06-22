@@ -16,8 +16,18 @@ const suggestedQuestions = [
 // قاموس الردود الشامل
 const magResponses = {
     'ألعاب': {
-        keywords: ['ألعاب', 'لعبة', 'games', 'game'],
-        response: '🎮 نحن نوفر ألعاب متنوعة:\n• روبلوكس\n• فري فاير\n• ببجي موبايل\n• ماين كرافت\n• وألعاب أخرى رائعة!\n\nاختر اللعبة التي تفضلها وانضم إلى فريقك! 🚀'
+        keywords: ['ألعاب', 'لعبة', 'games', 'game', 'أفضل'],
+        response: `🎮 أفضل الألعاب في TEAM_MG وأكثرها شهرة هما:
+
+🟦 Roblox
+
+تُعد Roblox من أكثر الألعاب شعبية بسبب تنوعها الهائل، فهي ليست لعبة واحدة بل منصة تحتوي على آلاف الألعاب والتجارب المختلفة التي يصنعها اللاعبون. يمكنك خوض مغامرات مثيرة، أو لعب ألعاب الرعب، أو سباقات السيارات، أو تحديات البقاء، أو حتى بناء عوالمك الخاصة. كما تتميز بإمكانية اللعب مع الأصدقاء والتعرف على لاعبين جدد، مما يجعلها خياراً رائعاً لمن يبحث عن المتعة والتجديد المستمر.
+
+🟩 Minecraft
+
+Minecraft هي لعبة الإبداع والاستكشاف بلا حدود. تمنحك الحرية لبناء المنازل والقصور والمدن الضخمة، أو خوض مغامرات مليئة بالتحديات ضد الوحوش والكهوف الغامضة. تتميز اللعبة بعالم مفتوح واسع وإمكانيات بناء لا نهائية، مما يجعل كل تجربة مختلفة عن الأخرى. سواء كنت من محبي البناء أو الاستكشاف أو البقاء على قيد الحياة، فإن Minecraft تقدم تجربة فريدة وممتعة للجميع.
+
+💚 شكراً لكم على القراءة، ونتمنى لكم وقتاً ممتعاً داخل TEAM_MG.`
     },
     'انضم': {
         keywords: ['انضم', 'أنضم', 'join', 'دخول', 'سيرفر'],
@@ -76,16 +86,16 @@ function createMagChat() {
                 height: 80px;
                 border-radius: 50%;
                 cursor: pointer;
-                font-size: 40px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
                 transition: all 0.3s;
                 position: relative;
-                background-image: url('mag-icon.png');
+                background-image: url('mag-avatar.png');
                 background-size: cover;
                 background-position: center;
+                background-repeat: no-repeat;
             " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
             </button>
             <p style="text-align: center; margin-top: 8px; color: white; font-weight: bold; font-size: 12px;">MAG</p>

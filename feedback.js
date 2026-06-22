@@ -120,34 +120,7 @@ function deleteFeedback(index) {
 
 // تعديل ملاحظة
 function editFeedback(index) {
-    const feedback = feedbackList[index];
-    const currentUserName = localStorage.getItem('userName');
-    
-    if (feedback.userName !== currentUserName) {
-        alert('❌ لا يمكنك تعديل ملاحظة شخص آخر!');
-        return;
-    }
-    
-    // تعيين القيم للتعديل
-    editingIndex = index;
-    selectedRating = feedback.rating;
-    selectedVisibility = feedback.visibility;
-    
-    // تحديث العرض أولاً
-    updateBadgeDisplay();
-    updateVisibilityDisplay();
-    
-    // ثم تعيين النص في textarea
-    const textArea = document.getElementById('feedbackText');
-    textArea.value = feedback.text;
-    
-    // تمرير إلى أعلى الصفحة والتركيز
-    setTimeout(() => {
-        textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        textArea.focus();
-    }, 200);
-    
-    alert('✏️ جاري تعديل الملاحظة - عدّل النص واضغط إرسال');
+    openEditModal(index);
 }
 
 // تحديث عرض الشعار المختار

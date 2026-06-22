@@ -1,7 +1,7 @@
 // تخزين الملاحظات
 let feedbackList = JSON.parse(localStorage.getItem('feedbackList')) || [];
 let selectedRating = null;
-let selectedVisibility = 'public'; // عام أو خاص
+let selectedVisibility = 'public';
 let isAdminMode = false;
 let editingIndex = null;
 
@@ -41,6 +41,7 @@ function checkAdminPassword() {
         return true;
     } else {
         alert('❌ كلمة السر خاطئة!');
+        isAdminMode = false;
         return false;
     }
 }
@@ -128,20 +129,23 @@ function editFeedback(index) {
     }
     
     // تعيين القيم للتعديل
-    document.getElementById('feedbackText').value = feedback.text;
+    editingIndex = index;
     selectedRating = feedback.rating;
     selectedVisibility = feedback.visibility;
-    editingIndex = index;
     
-    // تحديث العرض
+    // تحديث العرض أولاً
     updateBadgeDisplay();
     updateVisibilityDisplay();
     
-    // تمرير إلى أعلى الصفحة
+    // ثم تعيين النص في textarea
+    const textArea = document.getElementById('feedbackText');
+    textArea.value = feedback.text;
+    
+    // تمرير إلى أعلى الصفحة والتركيز
     setTimeout(() => {
-        document.getElementById('feedbackText').scrollIntoView({ behavior: 'smooth' });
-        document.getElementById('feedbackText').focus();
-    }, 100);
+        textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        textArea.focus();
+    }, 200);
     
     alert('✏️ جاري تعديل الملاحظة - عدّل النص واضغط إرسال');
 }
@@ -234,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 rating: selectedRating,
                 userName: userName,
                 visibility: selectedVisibility,
-                date: feedbackList[editingIndex].date, // الاحتفاظ بالتاريخ الأصلي
+                date: feedbackList[editingIndex].date,
                 editedDate: new Date().toISOString()
             };
             alert('✅ تم تحديث الملاحظة!');
@@ -261,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('feedbackText').value = '';
         selectedRating = null;
         selectedVisibility = 'public';
+        editingIndex = null;
         document.getElementById('selectedBadge').innerHTML = '<p style="color: #999; font-size: 14px;">اختر شعار التقييم</p>';
         badgeBtns.forEach(b => b.style.borderColor = '#ddd');
         updateVisibilityDisplay();

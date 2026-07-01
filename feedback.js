@@ -114,17 +114,21 @@ function displayFeedback() {
     
     // Add event listeners to buttons
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const id = parseInt(this.getAttribute('data-id'));
             editFeedbackItem(id);
-        });
+        };
     });
     
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const id = parseInt(this.getAttribute('data-id'));
             deleteFeedbackItem(id);
-        });
+        };
     });
 }
 
@@ -250,7 +254,7 @@ function submitFeedback() {
 }
 
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
     console.log('Feedback script loaded');
     
     requestUserName();
@@ -261,43 +265,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const badgeButtons = document.querySelectorAll('.badge-btn');
     console.log('Found badge buttons:', badgeButtons.length);
     badgeButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.onclick = function(e) {
             e.preventDefault();
+            e.stopPropagation();
             selectedRating = parseInt(this.getAttribute('data-rating'));
             console.log('Selected rating:', selectedRating);
             updateRatingDisplay();
-        });
+        };
     });
     
     // Visibility buttons
     const visibilityButtons = document.querySelectorAll('.visibility-btn');
     console.log('Found visibility buttons:', visibilityButtons.length);
     visibilityButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.onclick = function(e) {
             e.preventDefault();
+            e.stopPropagation();
             selectedVisibility = this.getAttribute('data-visibility');
             console.log('Selected visibility:', selectedVisibility);
             updateVisibilityDisplay();
-        });
+        };
     });
     
     // Submit button
     const submitBtn = document.getElementById('submitBtn');
     console.log('Submit button found:', submitBtn ? 'YES' : 'NO');
     if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
+        submitBtn.onclick = function(e) {
             e.preventDefault();
+            e.stopPropagation();
             console.log('Submit button clicked');
             submitFeedback();
-        });
+        };
     }
     
     // Admin button
     const adminBtn = document.getElementById('adminBtn');
     console.log('Admin button found:', adminBtn ? 'YES' : 'NO');
     if (adminBtn) {
-        adminBtn.addEventListener('click', function(e) {
+        adminBtn.onclick = function(e) {
             e.preventDefault();
+            e.stopPropagation();
             console.log('Admin button clicked');
             
             if (!isAdminMode) {
@@ -307,6 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('❌ تم إيقاف وضع الأدمن!');
                 displayFeedback();
             }
-        });
+        };
     }
 });

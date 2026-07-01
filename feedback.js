@@ -1,4 +1,4 @@
-// ===== متغيرات عامة =====
+// ===== FEEDBACK SYSTEM =====
 let selectedRating = null;
 let selectedVisibility = 'public';
 let editingId = null;
@@ -6,10 +6,8 @@ let isAdminMode = false;
 let allFeedback = [];
 let userName = '';
 
-// ===== كلمات محظورة =====
 const bannedWords = ['سب', 'قذف', 'شتم', 'http://', 'https://', 'www.'];
 
-// ===== دوال مساعدة =====
 function containsBannedWords(text) {
     return bannedWords.some(word => text.toLowerCase().includes(word.toLowerCase()));
 }
@@ -44,7 +42,6 @@ function displayFeedback() {
     
     container.innerHTML = '';
     
-    // تصفية الملاحظات المرئية
     const visible = allFeedback.filter(f => {
         if (f.visibility === 'private') {
             return f.userName === userName;
@@ -57,7 +54,6 @@ function displayFeedback() {
         return;
     }
     
-    // عرض الملاحظات
     visible.forEach(feedback => {
         const div = document.createElement('div');
         div.style.cssText = `
@@ -71,7 +67,6 @@ function displayFeedback() {
         `;
         
         const isOwner = feedback.userName === userName;
-        const canDelete = isOwner || isAdminMode;
         
         let buttonsHTML = '';
         if (isOwner) {
@@ -179,55 +174,39 @@ function checkAdminPassword() {
     }
 }
 
-// ===== معالجات الأحداث =====
+// ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('تحميل الصفحة...');
-    
-    // تحميل البيانات
     requestUserName();
     loadFeedback();
     displayFeedback();
     
-    console.log('اسم المستخدم:', userName);
-    console.log('عدد الملاحظات:', allFeedback.length);
-    
-    // ===== أزرار التقييم =====
+    // Badge buttons
     const badgeButtons = document.querySelectorAll('.badge-btn');
-    console.log('عدد أزرار التقييم:', badgeButtons.length);
-    
     badgeButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedRating = parseInt(this.getAttribute('data-rating'));
-            console.log('تم اختيار التقييم:', selectedRating);
             updateRatingDisplay();
         });
     });
     
-    // ===== أزرار الرؤية =====
+    // Visibility buttons
     const visibilityButtons = document.querySelectorAll('.visibility-btn');
-    console.log('عدد أزرار الرؤية:', visibilityButtons.length);
-    
     visibilityButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedVisibility = this.getAttribute('data-visibility');
-            console.log('تم اختيار الرؤية:', selectedVisibility);
             updateVisibilityDisplay();
         });
     });
     
-    // ===== زر الإرسال =====
+    // Submit button
     const submitBtn = document.getElementById('submitBtn');
-    console.log('زر الإرسال موجود:', !!submitBtn);
-    
     if (submitBtn) {
         submitBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('تم الضغط على زر الإرسال');
             
             const text = document.getElementById('feedbackText').value.trim();
-            console.log('النص:', text);
             
             if (!text) {
                 alert('❌ الرجاء كتابة ملاحظة');
@@ -245,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (editingId !== null) {
-                console.log('تحديث الملاحظة:', editingId);
                 const index = allFeedback.findIndex(f => f.id === editingId);
                 if (index !== -1) {
                     allFeedback[index].text = text;
@@ -254,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 editingId = null;
             } else {
-                console.log('إضافة ملاحظة جديدة');
                 allFeedback.push({
                     id: Date.now(),
                     text: text,
@@ -268,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveFeedback();
             displayFeedback();
             
-            // مسح النموذج
             document.getElementById('feedbackText').value = '';
             selectedRating = null;
             selectedVisibility = 'public';
@@ -279,14 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ===== زر الأدمن =====
+    // Admin button
     const adminBtn = document.getElementById('adminBtn');
-    console.log('زر الأدمن موجود:', !!adminBtn);
-    
     if (adminBtn) {
         adminBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('تم الضغط على زر الأدمن');
             
             if (!isAdminMode) {
                 checkAdminPassword();

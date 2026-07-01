@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team_MG - سيرفر ديسكورد للألعاب</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: direction 0.3s ease;
+        }
+
+        body.en {
+            direction: ltr;
+        }
+
+        body.ar {
+            direction: rtl;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .discord-icon {
+            font-size: 32px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .language-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-toggle-btn {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            display: block;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .nav-toggle-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.6);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        nav {
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        nav.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        .developer-credit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-top: 0px;
+            border-radius: 10px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .age-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .discord-button {
+            display: inline-block;
+            background: #5865F2;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            margin-left: 15px;
+        }
+
+        .discord-button:hover {
+            background: #4752C4;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(88, 101, 242, 0.4);
+        }
+
+        .content {
+            background: white;
+            padding: 60px 0;
+            margin-top: 40px;
+            border-radius: 10px;
+        }
+
+        .content h3 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .competitions-section {
+            margin-top: 40px;
+        }
+
+        .competition-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .competition-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .competition-toggle.active {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .competitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+            opacity: 1;
+        }
+
+        .competitions-grid.collapsed {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .competition-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .competition-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .competition-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .competition-description {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .prizes-section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        body.en .prizes-section {
+            text-align: right;
+        }
+
+        .prizes-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .prize-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        body.en .prize-item {
+            text-align: right;
+        }
+
+        .members-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .member-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .member-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .member-role {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ranks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .rank-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.en .rank-card {
+            border-left: none;
+            border-right: 5px solid #667eea;
+        }
+
+        .rank-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .rank-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        body.en .rank-header {
+            flex-direction: row-reverse;
+        }
+
+        .rank-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .rank-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .rank-description {
+            color: #666;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .rules-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .rules-section h4 {
+            color: #667eea;
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .rules-list {
+            margin-bottom: 30px;
+        }
+
+        .rule-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 4px solid #667eea;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        body.en .rule-item {
+            border-right: none;
+            border-left: 4px solid #667eea;
+            text-align: right;
+        }
+
+        .rule-item strong {
+            color: #667eea;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+        }
+
+        .feature h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .hero h2 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .discord-button {
+                margin-left: 0;
+                margin-top: 10px;
+                display: block;
+            }
+
+            .rules-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="ar">
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="60" height="60" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#F7931E;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#C1272D;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="logo-text">
+                        <span class="discord-icon">💬</span>
+                        <h1>Team_MG</h1>
+                        <img src="logo-mg.png" alt="MG Logo" class="mg-logo" style="height: 50px; width: auto; margin-left: 10px;">
+                        <img src="playstation_hand.png" alt="PlayStation Hand" class="ps-hand" style="height: 50px; width: auto; margin-left: 10px;">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="nav-toggle-btn" id="navToggleBtn" onclick="toggleNav()" style="display: flex !important; margin-right: 20px;">↑</button>
+                    <button class="language-toggle" onclick="toggleLanguage()">
+                        <span class="lang-text">English</span>
+                    </button>
+                    <nav id="mainNav">
+                        <ul>
+                            <li><a href="#home" class="nav-home">الرئيسية</a></li>
+                            <li><a href="#games" class="nav-games">الألعاب</a></li>
+                            <li><a href="#competitions" class="nav-competitions">المسابقات</a></li>
+                            <li><a href="#ranks" class="nav-ranks">الرتب</a></li>
+                            <li><a href="#members" class="nav-members">الأعضاء</a></li>
+                            <li><a href="#rules" class="nav-rules">القوانين</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="developer-credit">
+        <div class="container" style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <div style="text-align: center;">
+                <img src="arthur_profile.jpg" alt="Arthur" style="height: 80px; width: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #7c3aed;">
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #fff; font-weight: bold;">MUHAMMED | محمد [MG]</p>
+            </div>
+            <span class="dev-credit-text dev-credit" style="font-size: 18px;">تم التطوير من قِبل محمد مصطفى النعيمي (Admin)</span>
+        </div>
+    </div>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <h2 class="hero-title">مرحبا بكم في الموقع الرسمي ل Team_MG</h2>
+                    <p class="hero-desc">سيرفر ديسكورد متخصص في الألعاب المتنوعة - مجتمع آمن وممتع للاعبين من جميع المستويات</p>
+                    <div class="age-info">
+                        <span class="age-text">👥 نرحب بجميع الفئات العمرية من 6 سنوات حتى 30 سنة</span>
+                    </div>
+                    <br>
+                    <a href="https://discord.gg/nFcWP8QkQ" class="cta-button btn-discover" target="_blank">اكتشف المزيد</a>
+                    <a href="https://discord.gg/nFcWP8QkQ" class="discord-button btn-join" target="_blank">💬 انضم للسيرفر الآن</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="games">
+            <div class="container">
+                <h3 class="games-title">🎮 الألعاب المدعومة</h3>
+                <p class="games-desc" style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">
+                    نحن نستضيف مجتمعات لعشاق الألعاب المختلفة. انضم إلى قنوات اللعبة المفضلة لديك وتفاعل مع لاعبين آخرين
+                </p>
+                <div class="games-grid">
+                    <div class="game-card game-1">🎮 روبلوكس</div>
+                    <div class="game-card game-2">🔥 فري فاير</div>
+                    <div class="game-card game-3">💥 ببجي موبايل</div>
+                    <div class="game-card game-4">⛏️ ماين كرافت</div>
+                    <div class="game-card game-5">🎯 ألعاب أخرى</div>
+                    <div class="game-card game-6">🌟 ألعاب جديدة</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="competitions">
+            <div class="container">
+                <h3 class="comp-title">🏆 المسابقات والجوائز</h3>
+                <p class="comp-desc" style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">
+                    نقدم مسابقات متنوعة مع جوائز مدفوعة وفرص لرفع الرتب. يمكنك التسجيل من خلال خانة تسجيل مسبق في المسابقات في سيرفر الديسكورد
+                </p>
+                <div class="competitions-section">
+                    <button class="competition-toggle" onclick="toggleCompetitions()">
+                        <span class="toggle-text">▼ إظهار المسابقات</span>
+                    </button>
+                    <div class="competitions-grid collapsed" id="competitionsGrid">
+                        <div class="competition-card">
+                            <div class="competition-title comp-weekly-title">🔄 <span class="comp-weekly-title-text">مسابقات أسبوعية</span></div>
+                            <div class="competition-description comp-weekly-desc"><span class="comp-weekly-desc-text">مسابقات منتظمة كل أسبوع مع جوائز متنوعة وفرص لكسب نقاط ورفع الرتب</span></div>
+                            <div class="prizes-section">
+                                <div class="prizes-title">🎁 <span class="prizes-label">الجوائز:</span></div>
+                                <div class="prize-item">✨ <span class="prize-weekly-1">شعار الفائز الأسبوعي الحصري</span></div>
+                                <div class="prize-item">⭐ <span class="prize-weekly-2">نقاط ترقية لرفع الرتب</span></div>
+                                <div class="prize-item">🎖️ <span class="prize-weekly-3">ميدالية أسبوعية خاصة</span></div>
+                                <div class="prize-item">💎 <span class="prize-weekly-4">مكافآت إضافية</span></div>
+                            </div>
+                        </div>
+                        <div class="competition-card">
+                            <div class="competition-title comp-monthly-title">📅 <span class="comp-monthly-title-text">مسابقات شهرية</span></div>
+                            <div class="competition-description comp-monthly-desc"><span class="comp-monthly-desc-text">تحديات كبرى كل شهر مع جوائز مدفوعة وفرص حقيقية للفوز بمكافآت قيمة</span></div>
+                            <div class="prizes-section">
+                                <div class="prizes-title">🎁 <span class="prizes-label">الجوائز:</span></div>
+                                <div class="prize-item">👑 <span class="prize-monthly-1">شعار الفائز الشهري الفاخر</span></div>
+                                <div class="prize-item">💰 <span class="prize-monthly-2">جوائز مدفوعة نقداً</span></div>
+                                <div class="prize-item">🎁 <span class="prize-monthly-3">شحن كودات للألعاب</span></div>
+                                <div class="prize-item">🌟 <span class="prize-monthly-4">لقب شهري خاص</span></div>
+                            </div>
+                        </div>
+                        <div class="competition-card">
+                            <div class="competition-title comp-yearly-title">🎉 <span class="comp-yearly-title-text">مسابقات سنوية</span></div>
+                            <div class="competition-description comp-yearly-desc"><span class="comp-yearly-desc-text">حدث سنوي كبير مع أكبر الجوائز وأعظم التحديات وتتويج أفضل اللاعبين</span></div>
+                            <div class="prizes-section">
+                                <div class="prizes-title">🎁 <span class="prizes-label">الجوائز:</span></div>
+                                <div class="prize-item">🏆 <span class="prize-yearly-1">شعار البطل السنوي الذهبي</span></div>
+                                <div class="prize-item">💎 <span class="prize-yearly-2">جوائز فاخرة وقيمة جداً</span></div>
+                                <div class="prize-item">🌟 <span class="prize-yearly-3">لقب دائم في السيرفر</span></div>
+                                <div class="prize-item">👑 <span class="prize-yearly-4">رتبة خاصة "بطل السنة"</span></div>
+                                <div class="prize-item">🎖️ <span class="prize-yearly-5">شعارات وميداليات حصرية</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="ranks">
+            <div class="container">
+                <h3 class="ranks-title">🎖️ نظام الرتب الستة</h3>
+                <p class="ranks-desc" style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">
+                    نظام رتب متدرج يعكس مستوى التزامك ونشاطك في السيرفر
+                </p>
+                <div class="ranks-grid">
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">1</div>
+                            <div class="rank-title rank-1-title">مبتدئ 🖊️</div>
+                        </div>
+                        <div class="rank-description rank-1-desc">
+                            العضو الجديد الذي انضم للقروب حديثاً. يكون تحت فترة تجريبية لإثبات التزامه بالقوانين ومعرفة مدى تفاعله مع المجموعة.
+                        </div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">2</div>
+                            <div class="rank-title rank-2-title">خبير 👁️</div>
+                        </div>
+                        <div class="rank-description rank-2-desc">
+                            العضو القديم أو المتميز الذي يمتلك معرفة واسعة وثقافة عالية في مجال القروب، وتتميز مشاركاته بالعمق والفائدة والدقة.
+                        </div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">3</div>
+                            <div class="rank-title rank-3-title">نخبة 🔥</div>
+                        </div>
+                        <div class="rank-description rank-3-desc">
+                            أعلى رتبة تفاعلية وشرفية للأعضاء (غير الإداريين). تُمنح للأعضاء الأكثر شعبية، نشاطاً، وولاءً للقروب، وهم واجهة المجتمع النابضة بالحياة.
+                        </div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">4</div>
+                            <div class="rank-title rank-4-title">إدارة 📜</div>
+                        </div>
+                        <div class="rank-description rank-4-desc">
+                            بداية الطاقم الإداري، وهم المسؤولون عن تنظيم وتوثيق الفعاليات، ومراقبة الالتزام بالقوانين الـ12، ورفع التقارير اليومية عن حالة القروب.
+                        </div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">5</div>
+                            <div class="rank-title rank-5-title">مشرف ⚡</div>
+                        </div>
+                        <div class="rank-description rank-5-desc">
+                            القوة التنفيذية الضاربة في القروب. يمتلك سلطة ميدانية مباشرة للتدخل السريع وضبط النظام، وحل النزاعات، ومعاقبة المخالفين لحماية بيئة القروب.
+                        </div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div class="rank-number">6</div>
+                            <div class="rank-title rank-6-title">اونر 👑</div>
+                        </div>
+                        <div class="rank-description rank-6-desc">
+                            رأس الهرم، مؤسس القروب ومالكه الصاحب السيادة المطلقة والكلمة الأخيرة والنهائية في كل القرارات المصيرية والاستراتيجية التي تخص المجموعة.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="members">
+            <div class="container">
+                <h3 class="members-title">👥 أعضاء القروب للآن</h3>
+                <p class="members-desc" style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">
+                    فريق متخصص من المشرفين والأعضاء النشطين الذين يعملون على جعل السيرفر مكاناً ممتعاً وآمناً
+                </p>
+                <div class="members-grid">
+                    <div class="member-card">
+                        <div class="member-name">👑 Ahmed</div>
+                        <div class="member-role member-role-1">مالك السيرفر (Owner)</div>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-name">⭐ Arthur</div>
+                        <div class="member-role member-role-2">مشرف (Admin)</div>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-name">suhib618</div>
+                        <div class="member-role member-role-3">عضو نشط (Active)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="about">
+            <div class="container">
+                <h3 class="about-title">عن سيرفر Team_MG</h3>
+                <p class="about-desc" style="text-align: center; color: #666; margin-bottom: 40px; font-size: 18px;">
+                    نحن مجتمع من اللاعبين المتحمسين الذين يبحثون عن بيئة آمة وممتعة للعب والتفاعل. سيرفرنا مفتوح لجميع الأعمار والمستويات.
+                </p>
+                <div class="features">
+                    <div class="feature">
+                        <h4 class="feature-1-title">🤝 مجتمع آمن</h4>
+                        <p class="feature-1-desc">بيئة محترمة وآمنة للجميع مع قوانين صارمة تحافظ على سلامة الأعضاء.</p>
+                    </div>
+                    <div class="feature">
+                        <h4 class="feature-2-title">🎮 ألعاب متنوعة</h4>
+                        <p class="feature-2-desc">نستضيف قنوات لألعاب مختلفة تناسب جميع الأذواق والاهتمامات.</p>
+                    </div>
+                    <div class="feature">
+                        <h4 class="feature-3-title">🏆 مسابقات وجوائز</h4>
+                        <p class="feature-3-desc">مسابقات أسبوعية وشهرية وسنوية مع جوائز مدفوعة وفرص لرفع الرتب.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="rules">
+            <div class="container">
+                <h3 class="rules-title">📜 لائحة قوانين القروب الرسمية</h3>
+                
+                <div class="rules-section">
+                    <h4 class="rules-section-1">🤝 أولاً: الاحترام والتعامل المتبادل</h4>
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <strong>1. <span class="rule-1-title">الاحترام المتبادل خط أحمر:</span></strong> <span class="rule-1-desc">يمنع منعاً باتاً السب، القذف، السخرية، أو التقليل من شأن أي عضو في القروب مهما كان السبب. الاختلاف في الرأي أمر طبيعي، لكن قلة الأدب غير مقبولة.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>2. <span class="rule-2-title">منع العنصرية والتعصب:</span></strong> <span class="rule-2-desc">يُحظر تماماً أي حديث يثير النعرات القبلية، الطائفية، السياسية، أو العنصرية. القروب يجمعنا على الأخوة والمودة فقط.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>3. <span class="rule-3-title">حل الخلافات في الخاص:</span></strong> <span class="rule-3-desc">إذا حدث أي سوء تفاهم بين عضوين، يُمنع تحويل العام إلى ساحة شجار. تصفية الحسابات مكانها "الخاص"، أو يتم اللجوء للمشرفين لحل المشكلة ودياً.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-section">
+                    <h4 class="rules-section-2">📢 ثانياً: المحتوى والنشر</h4>
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <strong>4. <span class="rule-4-title">يمنع نشر المحتوى الحساس أو الخادش:</span></strong> <span class="rule-4-desc">يُحظر نشر أي صور، مقاطع فيديو، أو نصوص مخلة بالآداب، أو تحتوي على مشاهد عنف ودماء. القروب يجب أن يظل آمناً لجميع الأعمار.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>5. <span class="rule-5-title">لا للإعلانات والروابط المجهولة:</span></strong> <span class="rule-5-desc">يُمنع نشر روابط مجموعات أخرى، حسابات شخصية للدعم، أو إعلانات تجارية دون أخذ إذن مسبق وصريح من إدارة القروب.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>6. <span class="rule-6-title">تجنب الإشاعات والأخبار الكاذبة:</span></strong> <span class="rule-6-desc">يُمنع تداول الأخبار غير الموثوقة أو الشائعات التي تثير القلق. تأكد من مصدر الخبر قبل مشاركته.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-section">
+                    <h4 class="rules-section-3">⚙️ ثالثاً: التفاعل والخصوصية</h4>
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <strong>7. <span class="rule-7-title">احترام خصوصية الأعضاء:</span></strong> <span class="rule-7-desc">يُمنع منعاً باتاً أخذ لقطات شاشة (Screenshots) للمحادثات ونشرها خارج القروب، كما يُحظر إزعاج الأعضاء (خاصة الزميلات) في الخاص دون إذن.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>8. <span class="rule-8-title">ممنوع الـ "سبام" والتكرار:</span></strong> <span class="rule-8-desc">يُرجى تجنب إرسال عدد كبير من الرسائل أو الملصقات (Stickers) المتتالية التي تؤدي إلى تعليق القروب وإزعاج البقية.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>9. <span class="rule-9-title">الالتزام بهوية القروب:</span></strong> <span class="rule-9-desc">يرجى عدم الخروج عن الهدف الأساسي للقروب بشكل مفرط (إذا كان القروب مخصصاً لمجال معين كالدراسة، الألعاب، أو العمل).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-section">
+                    <h4 class="rules-section-4">👮 رابعاً: الإدارة والالتزام</h4>
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <strong>10. <span class="rule-10-title">قرارات المشرفين نهائية:</span></strong> <span class="rule-10-desc">تم تعيين المشرفين للحفاظ على النظام؛ لذا يجب احترام توجيهاتهم. أي اعتراض على قرار مشرف يتم مناقشته في الخاص وليس أمام الأعضاء.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>11. <span class="rule-11-title">التفاعل الإيجابي:</span></strong> <span class="rule-11-desc">يُمنع الوجود "الصنمي" الطويل دون عذر، القروب مجتمع تفاعلي ويُفضل مشاركة الجميع ليبقى الحماس مستمراً.</span>
+                        </div>
+                        <div class="rule-item">
+                            <strong>12. <span class="rule-12-title">آلية العقاب (نظام الإنذارات):</span></strong> <span class="rule-12-desc">خرق أي قانون يعرض العضو لإنذار. عند الحصول على 3 إنذارات، سيتم طرد العضو تلقائياً دون الرجوع إليه.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content" id="feedback" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0;">
+            <div class="container" style="max-width: 900px;">
+                <h3 class="feedback-title" style="color: white; text-align: center; margin-bottom: 40px; font-size: 32px;">📝 <span class="feedback-label">الملاحظات والتقييمات</span></h3>
+                <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <p style="text-align: center; color: #333; margin-bottom: 30px; font-size: 16px;">
+                        <span class="feedback-desc">شارك ملاحظاتك وآرائك حول تجربتك في الموقع والسيرفر</span>
+                    </p>
+                    
+                    <!-- أزرار الشعارات الفخمة -->
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <p style="color: #667eea; margin-bottom: 15px; font-weight: bold;"><span class="rating-label">قيّم تجربتك:</span></p>
+                        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                            <button class="badge-btn" data-rating="1" style="background: none; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; transition: all 0.3s;">
+                                <img src="badge-1-terrible.png" style="width: 90px; height: 90px; object-fit: contain;">
+                            </button>
+                            <button class="badge-btn" data-rating="2" style="background: none; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; transition: all 0.3s;">
+                                <img src="badge-2-poor.png" style="width: 90px; height: 90px; object-fit: contain;">
+                            </button>
+                            <button class="badge-btn" data-rating="3" style="background: none; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; transition: all 0.3s;">
+                                <img src="badge-3-neutral.png" style="width: 90px; height: 90px; object-fit: contain;">
+                            </button>
+                            <button class="badge-btn" data-rating="4" style="background: none; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; transition: all 0.3s;">
+                                <img src="badge-4-good.png" style="width: 90px; height: 90px; object-fit: contain;">
+                            </button>
+                            <button class="badge-btn" data-rating="5" style="background: none; border: 3px solid #ddd; border-radius: 10px; padding: 8px; cursor: pointer; transition: all 0.3s;">
+                                <img src="badge-5-excellent.png" style="width: 90px; height: 90px; object-fit: contain;">
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- الشعار المختار -->
+                    <div id="selectedBadge" style="text-align: center; margin-bottom: 20px; min-height: 120px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 10px;">
+                        <p style="color: #999; font-size: 14px;"><span class="ar">اختر شعار التقييم</span><span class="en" style="display: none;">Select a rating badge</span></p>
+                    </div>
+                    
+                    <!-- أزرار الرؤية (عام/خاص) -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: #667eea; margin-bottom: 10px; font-weight: bold;"><span class="ar">اختر نوع الملاحظة:</span><span class="en" style="display: none;">Feedback Type:</span></p>
+                        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                            <button class="visibility-btn" data-visibility="public" style="background: white; border: 3px solid #667eea; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; color: #667eea; transition: all 0.3s;">
+                                🌐 <span class="ar">عام (يراه الجميع)</span><span class="en" style="display: none;">Public</span>
+                            </button>
+                            <button class="visibility-btn" data-visibility="private" style="background: white; border: 3px solid #ddd; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: bold; color: #666; transition: all 0.3s;">
+                                🔒 <span class="ar">خاص (لك فقط)</span><span class="en" style="display: none;">Private</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- حقل الملاحظة -->
+                    <textarea id="feedbackText" placeholder="اكتب ملاحظاتك هنا..." style="width: 100%; height: 120px; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-family: Arial; font-size: 14px; resize: vertical; margin-bottom: 15px;" dir="rtl"></textarea>
+                    
+                    <!-- أزرار الإجراء -->
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button id="submitBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; transition: transform 0.2s;">
+                            <span class="ar">إرسال الملاحظة</span><span class="en" style="display: none;">Submit Feedback</span>
+                        </button>
+                        <button id="adminBtn" style="background: #ff9800; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; transition: transform 0.2s;">
+                            <span class="ar">🔐 وضع الأدمن</span><span class="en" style="display: none;">Admin Mode</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- قائمة الملاحظات المرسلة -->
+                <div style="margin-top: 40px;">
+                    <h4 style="color: white; text-align: center; margin-bottom: 20px; font-size: 24px;">
+                        <span class="ar">الملاحظات المرسلة</span><span class="en" style="display: none;">Submitted Feedback</span>
+                    </h4>
+                    <div id="feedbackList" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); min-height: 150px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth;">
+                        <p style="color: #999; text-align: center; width: 100%;"><span class="ar">لا توجد ملاحظات حتى الآن</span><span class="en" style="display: none;">No feedback yet</span></p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p class="footer-1">&copy; 2024 Team_MG. جميع الحقوق محفوظة.</p>
+            <p class="footer-2">سيرفر ديسكورد آمن وممتع للاعبين من جميع أنحاء العالم</p>
+        </div>
+    </footer>
+
+    <script>
+        const translations = {
+            ar: {
+                'dev-credit': 'تم التطوير من قِبل محمد مصطفى النعيمي (Admin)',
+                'btn-discover': 'اكتشف المزيد',
+                'btn-join': '💬 انضم للسيرفر الآن',
+                'game-1': '🎮 روبلوكس',
+                'game-2': '🔥 فري فاير',
+                'game-3': '💥 ببجي موبايل',
+                'game-4': '⛏️ ماين كرافت',
+                'game-5': '🎯 ألعاب أخرى',
+                'game-6': '🌟 ألعاب جديدة',
+                'nav-home': 'الرئيسية',
+                'nav-games': 'الألعاب',
+                'nav-competitions': 'المسابقات',
+                'nav-ranks': 'الرتب',
+                'nav-members': 'الأعضاء',
+                'nav-rules': 'القوانين',
+                'lang-text': 'English',
+                'hero-title': 'مرحبا بكم في الموقع الرسمي ل Team_MG',
+                'hero-desc': 'سيرفر ديسكورد متخصص في الألعاب المتنوعة - مجتمع آمن وممتع للاعبين من جميع المستويات',
+                'age-text': '👥 نرحب بجميع الفئات العمرية من 6 سنوات حتى 30 سنة',
+                'games-title': '🎮 الألعاب المدعومة',
+                'games-desc': 'نحن نستضيف مجتمعات لعشاق الألعاب المختلفة. انضم إلى قنوات اللعبة المفضلة لديك وتفاعل مع لاعبين آخرين',
+                'comp-title': '🏆 المسابقات والجوائز',
+                'comp-desc': 'نقدم مسابقات متنوعة مع جوائز مدفوعة وفرص لرفع الرتب. يمكنك التسجيل من خلال خانة تسجيل مسبق في المسابقات في سيرفر الديسكورد',
+                'comp-weekly-title-text': 'مسابقات أسبوعية',
+                'comp-weekly-desc-text': 'مسابقات منتظمة كل أسبوع مع جوائز متنوعة وفرص لكسب نقاط ورفع الرتب',
+                'prize-weekly-1': 'شعار الفائز الأسبوعي الحصري',
+                'prize-weekly-2': 'نقاط ترقية لرفع الرتب',
+                'prize-weekly-3': 'ميدالية أسبوعية خاصة',
+                'prize-weekly-4': 'مكافآت إضافية',
+                'comp-monthly-title-text': 'مسابقات شهرية',
+                'comp-monthly-desc-text': 'تحديات كبرى كل شهر مع جوائز مدفوعة وفرص حقيقية للفوز بمكافآت قيمة',
+                'prize-monthly-1': 'شعار الفائز الشهري الفاخر',
+                'prize-monthly-2': 'جوائز مدفوعة نقداً',
+                'prize-monthly-3': 'شحن كودات للألعاب',
+                'prize-monthly-4': 'لقب شهري خاص',
+                'comp-yearly-title-text': 'مسابقات سنوية',
+                'comp-yearly-desc-text': 'حدث سنوي كبير مع أكبر الجوائز وأعظم التحديات وتتويج أفضل اللاعبين',
+                'prize-yearly-1': 'شعار البطل السنوي الذهبي',
+                'prize-yearly-2': 'جوائز فاخرة وقيمة جداً',
+                'prize-yearly-3': 'لقب دائم في السيرفر',
+                'prize-yearly-4': 'رتبة خاصة "بطل السنة"',
+                'prize-yearly-5': 'شعارات وميداليات حصرية',
+                'prizes-label': 'الجوائز:',
+                'toggle-text': '▼ إظهار المسابقات',
+                'feedback-label': 'الملاحظات والتقييمات',
+                'feedback-desc': 'شارك ملاحظاتك وآرائك حول تجربتك في الموقع والسيرفر',
+                'rating-label': 'قيّم تجربتك:',
+                'ranks-title': '🎖️ نظام الرتب الستة',
+                'ranks-desc': 'نظام رتب متدرج يعكس مستوى التزامك ونشاطك في السيرفر',
+                'rank-1-title': 'مبتدئ 🖊️',
+                'rank-1-desc': 'العضو الجديد الذي انضم للقروب حديثاً. يكون تحت فترة تجريبية لإثبات التزامه بالقوانين ومعرفة مدى تفاعله مع المجموعة.',
+                'rank-2-title': 'خبير 👁️',
+                'rank-2-desc': 'العضو القديم أو المتميز الذي يمتلك معرفة واسعة وثقافة عالية في مجال القروب، وتتميز مشاركاته بالعمق والفائدة والدقة.',
+                'rank-3-title': 'نخبة 🔥',
+                'rank-3-desc': 'أعلى رتبة تفاعلية وشرفية للأعضاء (غير الإداريين). تُمنح للأعضاء الأكثر شعبية، نشاطاً، وولاءً للقروب، وهم واجهة المجتمع النابضة بالحياة.',
+                'rank-4-title': 'إدارة 📜',
+                'rank-4-desc': 'بداية الطاقم الإداري، وهم المسؤولون عن تنظيم وتوثيق الفعاليات، ومراقبة الالتزام بالقوانين الـ12، ورفع التقارير اليومية عن حالة القروب.',
+                'rank-5-title': 'مشرف ⚡',
+                'rank-5-desc': 'القوة التنفيذية الضاربة في القروب. يمتلك سلطة ميدانية مباشرة للتدخل السريع وضبط النظام، وحل النزاعات، ومعاقبة المخالفين لحماية بيئة القروب.',
+                'rank-6-title': 'اونر 👑',
+                'rank-6-desc': 'رأس الهرم، مؤسس القروب ومالكه الصاحب السيادة المطلقة والكلمة الأخيرة والنهائية في كل القرارات المصيرية والاستراتيجية التي تخص المجموعة.',
+                'members-title': '👥 أعضاء القروب للآن',
+                'members-desc': 'فريق متخصص من المشرفين والأعضاء النشطين الذين يعملون على جعل السيرفر مكاناً ممتعاً وآمناً',
+                'member-role-1': 'مالك السيرفر (Owner)',
+                'member-role-2': 'مشرف (Admin)',
+                'member-role-3': 'عضو نشط (Active)',
+                'about-title': 'عن سيرفر Team_MG',
+                'about-desc': 'نحن مجتمع من اللاعبين المتحمسين الذين يبحثون عن بيئة آمة وممتعة للعب والتفاعل. سيرفرنا مفتوح لجميع الأعمار والمستويات.',
+                'feature-1-title': '🤝 مجتمع آمن',
+                'feature-1-desc': 'بيئة محترمة وآمنة للجميع مع قوانين صارمة تحافظ على سلامة الأعضاء.',
+                'feature-2-title': '🎮 ألعاب متنوعة',
+                'feature-2-desc': 'نستضيف قنوات لألعاب مختلفة تناسب جميع الأذواق والاهتمامات.',
+                'feature-3-title': '🏆 مسابقات وجوائز',
+                'feature-3-desc': 'مسابقات أسبوعية وشهرية وسنوية مع جوائز مدفوعة وفرص لرفع الرتب.',
+                'rules-title': '📜 لائحة قوانين القروب الرسمية',
+                'rules-section-1': '🤝 أولاً: الاحترام والتعامل المتبادل',
+                'rules-section-2': '📢 ثانياً: المحتوى والنشر',
+                'rules-section-3': '⚙️ ثالثاً: التفاعل والخصوصية',
+                'rules-section-4': '👮 رابعاً: الإدارة والالتزام',
+                'rule-1-title': 'الاحترام المتبادل خط أحمر:',
+                'rule-1-desc': 'يمنع منعاً باتاً السب، القذف، السخرية، أو التقليل من شأن أي عضو في القروب مهما كان السبب. الاختلاف في الرأي أمر طبيعي، لكن قلة الأدب غير مقبولة.',
+                'rule-2-title': 'منع العنصرية والتعصب:',
+                'rule-2-desc': 'يُحظر تماماً أي حديث يثير النعرات القبلية، الطائفية، السياسية، أو العنصرية. القروب يجمعنا على الأخوة والمودة فقط.',
+                'rule-3-title': 'حل الخلافات في الخاص:',
+                'rule-3-desc': 'إذا حدث أي سوء تفاهم بين عضوين، يُمنع تحويل العام إلى ساحة شجار. تصفية الحسابات مكانها "الخاص"، أو يتم اللجوء للمشرفين لحل المشكلة ودياً.',
+                'rule-4-title': 'يمنع نشر المحتوى الحساس أو الخادش:',
+                'rule-4-desc': 'يُحظر نشر أي صور، مقاطع فيديو، أو نصوص مخلة بالآداب، أو تحتوي على مشاهد عنف ودماء. القروب يجب أن يظل آمناً لجميع الأعمار.',
+                'rule-5-title': 'لا للإعلانات والروابط المجهولة:',
+                'rule-5-desc': 'يُمنع نشر روابط مجموعات أخرى، حسابات شخصية للدعم، أو إعلانات تجارية دون أخذ إذن مسبق وصريح من إدارة القروب.',
+                'rule-6-title': 'تجنب الإشاعات والأخبار الكاذبة:',
+                'rule-6-desc': 'يُمنع تداول الأخبار غير الموثوقة أو الشائعات التي تثير القلق. تأكد من مصدر الخبر قبل مشاركته.',
+                'rule-7-title': 'احترام خصوصية الأعضاء:',
+                'rule-7-desc': 'يُمنع منعاً باتاً أخذ لقطات شاشة (Screenshots) للمحادثات ونشرها خارج القروب، كما يُحظر إزعاج الأعضاء (خاصة الزميلات) في الخاص دون إذن.',
+                'rule-8-title': 'ممنوع الـ "سبام" والتكرار:',
+                'rule-8-desc': 'يُرجى تجنب إرسال عدد كبير من الرسائل أو الملصقات (Stickers) المتتالية التي تؤدي إلى تعليق القروب وإزعاج البقية.',
+                'rule-9-title': 'الالتزام بهوية القروب:',
+                'rule-9-desc': 'يرجى عدم الخروج عن الهدف الأساسي للقروب بشكل مفرط (إذا كان القروب مخصصاً لمجال معين كالدراسة، الألعاب، أو العمل).',
+                'rule-10-title': 'قرارات المشرفين نهائية:',
+                'rule-10-desc': 'تم تعيين المشرفين للحفاظ على النظام؛ لذا يجب احترام توجيهاتهم. أي اعتراض على قرار مشرف يتم مناقشته في الخاص وليس أمام الأعضاء.',
+                'rule-11-title': 'التفاعل الإيجابي:',
+                'rule-11-desc': 'يُمنع الوجود "الصنمي" الطويل دون عذر، القروب مجتمع تفاعلي ويُفضل مشاركة الجميع ليبقى الحماس مستمراً.',
+                'rule-12-title': 'آلية العقاب (نظام الإنذارات):',
+                'rule-12-desc': 'خرق أي قانون يعرض العضو لإنذار. عند الحصول على 3 إنذارات، سيتم طرد العضو تلقائياً دون الرجوع إليه.',
+                'footer-1': '&copy; 2024 Team_MG. جميع الحقوق محفوظة.',
+                'footer-2': 'سيرفر ديسكورد آمن وممتع للاعبين من جميع أنحاء العالم',
+            },
+            en: {
+                'dev-credit': 'Developed by Muhammad Mustafa Al-Nuaimi (Admin)',
+                'btn-discover': 'Learn More',
+                'btn-join': '💬 Join Server Now',
+                'game-1': '🎮 Roblox',
+                'game-2': '🔥 Free Fire',
+                'game-3': '💥 PUBG Mobile',
+                'game-4': '⛏️ Minecraft',
+                'game-5': '🎯 Other Games',
+                'game-6': '🌟 New Games',
+                'nav-home': 'Home',
+                'nav-games': 'Games',
+                'nav-competitions': 'Competitions',
+                'nav-ranks': 'Ranks',
+                'nav-members': 'Members',
+                'nav-rules': 'Rules',
+                'lang-text': 'العربية',
+                'hero-title': 'Welcome to the Official Team_MG Website',
+                'hero-desc': 'A Discord server specialized in various games - a safe and fun community for players of all levels',
+                'age-text': '👥 We welcome all age groups from 6 to 30 years old',
+                'games-title': '🎮 Supported Games',
+                'games-desc': 'We host communities for fans of different games. Join your favorite game channel and interact with other players',
+                'comp-title': '🏆 Competitions and Prizes',
+                'comp-desc': 'We offer various competitions with paid prizes and opportunities to advance ranks. You can register through the pre-registration form in the competitions channel on Discord',
+                'comp-weekly-title-text': 'Weekly Competitions',
+                'comp-weekly-desc-text': 'Regular competitions every week with various prizes and opportunities to earn points and advance ranks',
+                'prize-weekly-1': 'Exclusive Weekly Winner Badge',
+                'prize-weekly-2': 'Rank Promotion Points',
+                'prize-weekly-3': 'Special Weekly Medal',
+                'prize-weekly-4': 'Additional Rewards',
+                'comp-monthly-title-text': 'Monthly Competitions',
+                'comp-monthly-desc-text': 'Major challenges every month with paid prizes and real opportunities to win valuable rewards',
+                'prize-monthly-1': 'Luxurious Monthly Winner Badge',
+                'prize-monthly-2': 'Cash Prizes',
+                'prize-monthly-3': 'Game Code Recharge',
+                'prize-monthly-4': 'Special Monthly Title',
+                'comp-yearly-title-text': 'Yearly Competitions',
+                'comp-yearly-desc-text': 'A major annual event with the biggest prizes, greatest challenges, and crowning of the best players',
+                'prize-yearly-1': 'Golden Annual Champion Badge',
+                'prize-yearly-2': 'Luxurious and Valuable Prizes',
+                'prize-yearly-3': 'Permanent Title in the Server',
+                'prize-yearly-4': 'Special Player of the Year Rank',
+                'prize-yearly-5': 'Exclusive Badges and Medals',
+                'prizes-label': 'Prizes:',
+                'toggle-text': '▼ Show Competitions',
+                'feedback-label': 'Feedback and Ratings',
+                'feedback-desc': 'Share your feedback and opinions about your experience on the website and server',
+                'rating-label': 'Rate your experience:',
+                'ranks-title': '🎖️ The 6-Tier Ranking System',
+                'ranks-desc': 'A tiered ranking system that reflects your commitment and activity level in the server',
+                'rank-1-title': 'Novice 🖊️',
+                'rank-1-desc': 'A new member who recently joined the group. They are on a trial period to prove their commitment to the rules and show their interaction with the group.',
+                'rank-2-title': 'Expert 👁️',
+                'rank-2-desc': 'An old or distinguished member who has extensive knowledge and high culture in the group\'s field, with contributions characterized by depth, usefulness, and accuracy.',
+                'rank-3-title': 'Elite 🔥',
+                'rank-3-desc': 'The highest interactive and honorary rank for members (non-administrative). Awarded to the most popular, active, and loyal members to the group, who are the face of the vibrant community.',
+                'rank-4-title': 'Management 📜',
+                'rank-4-desc': 'The beginning of the administrative team, responsible for organizing and documenting events, monitoring compliance with the 12 rules, and submitting daily reports on the group\'s status.',
+                'rank-5-title': 'Supervisor ⚡',
+                'rank-5-desc': 'The striking executive force in the group. Has direct field authority for quick intervention and system control, resolving disputes, and punishing violators to protect the group\'s environment.',
+                'rank-6-title': 'Owner 👑',
+                'rank-6-desc': 'The top of the hierarchy, the founder and owner of the group with absolute sovereignty and the final say in all strategic and decisive decisions concerning the group.',
+                'members-title': '👥 Current Group Members',
+                'members-desc': 'A specialized team of moderators and active members working to make the server a fun and safe place',
+                'member-role-1': 'Server Owner (Owner)',
+                'member-role-2': 'Moderator (Admin)',
+                'member-role-3': 'Active Member (Active)',
+                'about-title': 'About Team_MG Server',
+                'about-desc': 'We are a community of enthusiastic gamers looking for a safe and fun environment to play and interact. Our server is open to all ages and levels.',
+                'feature-1-title': '🤝 Safe Community',
+                'feature-1-desc': 'A respectful and safe environment for everyone with strict rules that protect members\' safety.',
+                'feature-2-title': '🎮 Diverse Games',
+                'feature-2-desc': 'We host channels for different games that suit all tastes and interests.',
+                'feature-3-title': '🏆 Competitions and Prizes',
+                'feature-3-desc': 'Weekly, monthly, and yearly competitions with paid prizes and opportunities to advance ranks.',
+                'rules-title': '📜 Official Group Rules',
+                'rules-section-1': '🤝 First: Mutual Respect and Treatment',
+                'rules-section-2': '📢 Second: Content and Publishing',
+                'rules-section-3': '⚙️ Third: Interaction and Privacy',
+                'rules-section-4': '👮 Fourth: Management and Compliance',
+                'rule-1-title': 'Mutual Respect is a Red Line:',
+                'rule-1-desc': 'Swearing, slander, mockery, or belittling any member is strictly prohibited. Disagreements are natural, but disrespect is not acceptable.',
+                'rule-2-title': 'No Racism or Prejudice:',
+                'rule-2-desc': 'Any speech that incites tribal, sectarian, political, or racial tensions is strictly forbidden. The group unites us through brotherhood and goodwill only.',
+                'rule-3-title': 'Resolve Conflicts Privately:',
+                'rule-3-desc': 'If there is any misunderstanding between members, do not turn the public space into a battlefield. Settle disputes privately or consult moderators for a peaceful resolution.',
+                'rule-4-title': 'No Sensitive or Offensive Content:',
+                'rule-4-desc': 'Posting images, videos, or texts that are inappropriate or contain violence and blood is prohibited. The group must remain safe for all ages.',
+                'rule-5-title': 'No Ads or Unknown Links:',
+                'rule-5-desc': 'Posting links to other groups, personal accounts for promotion, or commercial ads without explicit permission from group management is forbidden.',
+                'rule-6-title': 'Avoid Rumors and Fake News:',
+                'rule-6-desc': 'Spreading unverified news or rumors that cause concern is prohibited. Verify your sources before sharing.',
+                'rule-7-title': 'Respect Members\' Privacy:',
+                'rule-7-desc': 'Taking and sharing screenshots of conversations outside the group is strictly forbidden. Do not disturb members (especially female members) in private without permission.',
+                'rule-8-title': 'No Spam or Repetition:',
+                'rule-8-desc': 'Avoid sending multiple consecutive messages or stickers that cause the group to lag and annoy others.',
+                'rule-9-title': 'Stick to Group Purpose:',
+                'rule-9-desc': 'Do not excessively deviate from the group\'s main purpose (whether it\'s for studies, games, or work).',
+                'rule-10-title': 'Moderator Decisions are Final:',
+                'rule-10-desc': 'Moderators are appointed to maintain order, so respect their guidance. Any objection to a moderator\'s decision should be discussed privately, not publicly.',
+                'rule-11-title': 'Positive Interaction:',
+                'rule-11-desc': 'Long periods of inactivity without reason are not allowed. The group is interactive, and we encourage everyone to participate to keep the enthusiasm alive.',
+                'rule-12-title': 'Punishment System (Warning System):',
+                'rule-12-desc': 'Breaking any rule results in a warning. After receiving 3 warnings, the member will be automatically removed without further notice.',
+                'footer-1': '&copy; 2024 Team_MG. All rights reserved.',
+                'footer-2': 'A safe and fun Discord server for players from all over the world',
+            }
+        };
+
+        function toggleLanguage() {
+            const body = document.body;
+            const isArabic = body.classList.contains('ar');
+            
+            if (isArabic) {
+                body.classList.remove('ar');
+                body.classList.add('en');
+                document.documentElement.lang = 'en';
+                document.documentElement.dir = 'ltr';
+                updateAllText('en');
+            } else {
+                body.classList.remove('en');
+                body.classList.add('ar');
+                document.documentElement.lang = 'ar';
+                document.documentElement.dir = 'rtl';
+                updateAllText('ar');
+            }
+        }
+
+        function updateAllText(lang) {
+            const trans = translations[lang];
+            
+            for (const [key, value] of Object.entries(trans)) {
+                const elements = document.querySelectorAll('.' + key);
+                elements.forEach(el => {
+                    el.textContent = value;
+                });
+            }
+        }
+
+        function toggleCompetitions() {
+            const grid = document.getElementById('competitionsGrid');
+            const toggleText = document.querySelector('.toggle-text');
+            
+            grid.classList.toggle('collapsed');
+            
+            if (grid.classList.contains('collapsed')) {
+                toggleText.textContent = document.body.classList.contains('ar') ? '▼ إظهار المسابقات' : '▼ Show Competitions';
+            } else {
+                toggleText.textContent = document.body.classList.contains('ar') ? '▲ إخفاء المسابقات' : '▲ Hide Competitions';
+            }
+        }
+
+        let navHidden = false;
+        function toggleNav() {
+            const nav = document.getElementById('mainNav');
+            const btn = document.getElementById('navToggleBtn');
+            
+            navHidden = !navHidden;
+            
+            if (navHidden) {
+                nav.classList.add('hidden');
+                btn.textContent = '↓';
+                btn.style.display = 'block';
+            } else {
+                nav.classList.remove('hidden');
+                btn.textContent = '↑';
+            }
+        }
+    </script>
+    <script src="supabase-config.js"></script>
+    <script src="edit-modal.js"></script>
+    <script src="feedback.js"></script>
+</body>
+</html>

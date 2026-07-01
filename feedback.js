@@ -28,17 +28,25 @@ function loadFeedback() {
         const saved = localStorage.getItem('allFeedback');
         allFeedback = saved ? JSON.parse(saved) : [];
     } catch (e) {
+        console.error('Error loading feedback:', e);
         allFeedback = [];
     }
 }
 
 function saveFeedback() {
-    localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+    try {
+        localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+    } catch (e) {
+        console.error('Error saving feedback:', e);
+    }
 }
 
 function displayFeedback() {
     const container = document.getElementById('feedbackList');
-    if (!container) return;
+    if (!container) {
+        console.error('feedbackList container not found');
+        return;
+    }
     
     container.innerHTML = '';
     
@@ -110,13 +118,16 @@ function editFeedbackItem(id) {
     if (!feedback || feedback.userName !== userName) return;
     
     editingId = id;
-    document.getElementById('feedbackText').value = feedback.text;
+    const textArea = document.getElementById('feedbackText');
+    if (textArea) {
+        textArea.value = feedback.text;
+        textArea.focus();
+    }
     selectedRating = feedback.rating;
     selectedVisibility = feedback.visibility;
     
     updateRatingDisplay();
     updateVisibilityDisplay();
-    document.getElementById('feedbackText').focus();
 }
 
 function deleteFeedbackItem(id) {
@@ -174,92 +185,105 @@ function checkAdminPassword() {
     }
 }
 
+function submitFeedback() {
+    const text = document.getElementById('feedbackText').value.trim();
+    
+    if (!text) {
+        alert('❌ الرجاء كتابة ملاحظة');
+        return;
+    }
+    
+    if (selectedRating === null) {
+        alert('❌ الرجاء اختيار تقييم');
+        return;
+    }
+    
+    if (containsBannedWords(text)) {
+        alert('⚠️ تحتوي الملاحظة على كلمات محظورة أو روابط!');
+        return;
+    }
+    
+    if (editingId !== null) {
+        const index = allFeedback.findIndex(f => f.id === editingId);
+        if (index !== -1) {
+            allFeedback[index].text = text;
+            allFeedback[index].rating = selectedRating;
+            allFeedback[index].visibility = selectedVisibility;
+        }
+        editingId = null;
+    } else {
+        allFeedback.push({
+            id: Date.now(),
+            text: text,
+            rating: selectedRating,
+            visibility: selectedVisibility,
+            userName: userName,
+            timestamp: new Date().toLocaleString('ar-SA')
+        });
+    }
+    
+    saveFeedback();
+    displayFeedback();
+    
+    document.getElementById('feedbackText').value = '';
+    selectedRating = null;
+    selectedVisibility = 'public';
+    updateRatingDisplay();
+    updateVisibilityDisplay();
+    
+    alert('✅ تم إرسال الملاحظة بنجاح!');
+}
+
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
+    console.log('Feedback script loaded');
+    
     requestUserName();
     loadFeedback();
     displayFeedback();
     
     // Badge buttons
     const badgeButtons = document.querySelectorAll('.badge-btn');
+    console.log('Found badge buttons:', badgeButtons.length);
     badgeButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedRating = parseInt(this.getAttribute('data-rating'));
+            console.log('Selected rating:', selectedRating);
             updateRatingDisplay();
         });
     });
     
     // Visibility buttons
     const visibilityButtons = document.querySelectorAll('.visibility-btn');
+    console.log('Found visibility buttons:', visibilityButtons.length);
     visibilityButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedVisibility = this.getAttribute('data-visibility');
+            console.log('Selected visibility:', selectedVisibility);
             updateVisibilityDisplay();
         });
     });
     
     // Submit button
     const submitBtn = document.getElementById('submitBtn');
+    console.log('Submit button found:', submitBtn ? 'YES' : 'NO');
     if (submitBtn) {
         submitBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            const text = document.getElementById('feedbackText').value.trim();
-            
-            if (!text) {
-                alert('❌ الرجاء كتابة ملاحظة');
-                return;
-            }
-            
-            if (selectedRating === null) {
-                alert('❌ الرجاء اختيار تقييم');
-                return;
-            }
-            
-            if (containsBannedWords(text)) {
-                alert('⚠️ تحتوي الملاحظة على كلمات محظورة أو روابط!');
-                return;
-            }
-            
-            if (editingId !== null) {
-                const index = allFeedback.findIndex(f => f.id === editingId);
-                if (index !== -1) {
-                    allFeedback[index].text = text;
-                    allFeedback[index].rating = selectedRating;
-                    allFeedback[index].visibility = selectedVisibility;
-                }
-                editingId = null;
-            } else {
-                allFeedback.push({
-                    id: Date.now(),
-                    text: text,
-                    rating: selectedRating,
-                    visibility: selectedVisibility,
-                    userName: userName,
-                    timestamp: new Date().toLocaleString('ar-SA')
-                });
-            }
-            
-            saveFeedback();
-            displayFeedback();
-            
-            document.getElementById('feedbackText').value = '';
-            selectedRating = null;
-            selectedVisibility = 'public';
-            updateRatingDisplay();
-            updateVisibilityDisplay();
-            
-            alert('✅ تم إرسال الملاحظة بنجاح!');
+            console.log('Submit button clicked');
+            submitFeedback();
         });
     }
     
     // Admin button
     const adminBtn = document.getElementById('adminBtn');
+    console.log('Admin button found:', adminBtn ? 'YES' : 'NO');
     if (adminBtn) {
         adminBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Admin button clicked');
             
             if (!isAdminMode) {
                 checkAdminPassword();

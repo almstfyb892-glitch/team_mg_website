@@ -1,28 +1,37 @@
-// متغيرات عامة
+// ===== متغيرات عامة =====
 let selectedRating = null;
 let selectedVisibility = 'public';
 let editingId = null;
 let isAdminMode = false;
 let allFeedback = [];
-let userName = localStorage.getItem('userName') || '';
+let userName = '';
 
-// كلمات محظورة
+// ===== كلمات محظورة =====
 const bannedWords = ['سب', 'قذف', 'شتم', 'http://', 'https://', 'www.'];
 
+// ===== دوال مساعدة =====
 function containsBannedWords(text) {
     return bannedWords.some(word => text.toLowerCase().includes(word.toLowerCase()));
 }
 
 function requestUserName() {
+    userName = localStorage.getItem('userName');
     if (!userName) {
-        userName = prompt('👤 أدخل اسم حسابك:') || 'زائر';
+        userName = prompt('👤 أدخل اسم حسابك:');
+        if (!userName || userName.trim() === '') {
+            userName = 'زائر';
+        }
         localStorage.setItem('userName', userName);
     }
 }
 
 function loadFeedback() {
-    const saved = localStorage.getItem('allFeedback');
-    allFeedback = saved ? JSON.parse(saved) : [];
+    try {
+        const saved = localStorage.getItem('allFeedback');
+        allFeedback = saved ? JSON.parse(saved) : [];
+    } catch (e) {
+        allFeedback = [];
+    }
 }
 
 function saveFeedback() {
@@ -35,16 +44,21 @@ function displayFeedback() {
     
     container.innerHTML = '';
     
-    const visible = allFeedback.filter(f => 
-        f.visibility === 'public' || f.userName === userName
-    );
+    // تصفية الملاحظات المرئية
+    const visible = allFeedback.filter(f => {
+        if (f.visibility === 'private') {
+            return f.userName === userName;
+        }
+        return true;
+    });
     
     if (visible.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999; width: 100%;">لا توجد ملاحظات</p>';
+        container.innerHTML = '<p style="text-align: center; color: #999; width: 100%;">لا توجد ملاحظات حتى الآن</p>';
         return;
     }
     
-    visible.forEach(f => {
+    // عرض الملاحظات
+    visible.forEach(feedback => {
         const div = document.createElement('div');
         div.style.cssText = `
             background: white;
@@ -56,28 +70,39 @@ function displayFeedback() {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         `;
         
-        const isOwner = f.userName === userName;
+        const isOwner = feedback.userName === userName;
+        const canDelete = isOwner || isAdminMode;
+        
+        let buttonsHTML = '';
+        if (isOwner) {
+            buttonsHTML = `
+                <button onclick="editFeedbackItem(${feedback.id})" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px;">✏️ تعديل</button>
+                <button onclick="deleteFeedbackItem(${feedback.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
+            `;
+        } else if (isAdminMode) {
+            buttonsHTML = `
+                <button onclick="deleteFeedbackItem(${feedback.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
+            `;
+        }
+        
+        const starsHTML = Array(5).fill(0).map((_, i) => 
+            `<span style="font-size: 20px; opacity: ${i < feedback.rating ? '1' : '0.3'};">⭐</span>`
+        ).join('');
         
         div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                 <div>
-                    <p style="margin: 0; font-weight: bold;">👤 ${f.userName}</p>
-                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #999;">${f.timestamp}</p>
-                    ${f.visibility === 'private' ? '<p style="margin: 5px 0 0 0; font-size: 12px; color: #f44336;">🔒 خاص</p>' : ''}
+                    <p style="margin: 0; font-weight: bold; color: #333;">👤 ${feedback.userName}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #999;">${feedback.timestamp}</p>
+                    ${feedback.visibility === 'private' ? '<p style="margin: 5px 0 0 0; font-size: 12px; color: #f44336;">🔒 خاص</p>' : ''}
                 </div>
                 <div style="display: flex; gap: 5px;">
-                    ${isOwner ? `
-                        <button onclick="editFeedback(${f.id})" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">✏️</button>
-                        <button onclick="deleteFeedback(${f.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️</button>
-                    ` : ''}
-                    ${isAdminMode && !isOwner ? `
-                        <button onclick="deleteFeedback(${f.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️</button>
-                    ` : ''}
+                    ${buttonsHTML}
                 </div>
             </div>
-            <p style="margin: 10px 0; color: #333;">${f.text}</p>
-            <div style="display: flex; gap: 5px;">
-                ${Array(5).fill(0).map((_, i) => `<span style="font-size: 20px; opacity: ${i < f.rating ? '1' : '0.3'};">⭐</span>`).join('')}
+            <p style="margin: 10px 0; color: #333; line-height: 1.6;">${feedback.text}</p>
+            <div style="display: flex; gap: 5px; margin-top: 10px;">
+                ${starsHTML}
             </div>
         `;
         
@@ -85,29 +110,37 @@ function displayFeedback() {
     });
 }
 
-function editFeedback(id) {
-    const f = allFeedback.find(x => x.id === id);
-    if (!f) return;
+function editFeedbackItem(id) {
+    const feedback = allFeedback.find(f => f.id === id);
+    if (!feedback || feedback.userName !== userName) return;
     
     editingId = id;
-    document.getElementById('feedbackText').value = f.text;
-    selectedRating = f.rating;
-    selectedVisibility = f.visibility;
+    document.getElementById('feedbackText').value = feedback.text;
+    selectedRating = feedback.rating;
+    selectedVisibility = feedback.visibility;
     
     updateRatingDisplay();
     updateVisibilityDisplay();
+    document.getElementById('feedbackText').focus();
 }
 
-function deleteFeedback(id) {
-    if (confirm('حذف هذه الملاحظة؟')) {
-        allFeedback = allFeedback.filter(x => x.id !== id);
+function deleteFeedbackItem(id) {
+    const feedback = allFeedback.find(f => f.id === id);
+    if (!feedback) return;
+    
+    const isOwner = feedback.userName === userName;
+    if (!isOwner && !isAdminMode) return;
+    
+    if (confirm('هل تريد حذف هذه الملاحظة؟')) {
+        allFeedback = allFeedback.filter(f => f.id !== id);
         saveFeedback();
         displayFeedback();
     }
 }
 
 function updateRatingDisplay() {
-    document.querySelectorAll('.badge-btn').forEach(btn => {
+    const buttons = document.querySelectorAll('.badge-btn');
+    buttons.forEach(btn => {
         const rating = parseInt(btn.getAttribute('data-rating'));
         if (rating === selectedRating) {
             btn.style.borderColor = '#667eea';
@@ -120,8 +153,10 @@ function updateRatingDisplay() {
 }
 
 function updateVisibilityDisplay() {
-    document.querySelectorAll('.visibility-btn').forEach(btn => {
-        if (btn.getAttribute('data-visibility') === selectedVisibility) {
+    const buttons = document.querySelectorAll('.visibility-btn');
+    buttons.forEach(btn => {
+        const visibility = btn.getAttribute('data-visibility');
+        if (visibility === selectedVisibility) {
             btn.style.borderColor = '#667eea';
             btn.style.borderWidth = '3px';
             btn.style.backgroundColor = '#f0f4ff';
@@ -134,67 +169,92 @@ function updateVisibilityDisplay() {
 }
 
 function checkAdminPassword() {
-    const pwd = prompt('🔐 كلمة السر:');
-    if (pwd === 'TeamMG@2024#SecureAdmin$789') {
+    const password = prompt('🔐 أدخل كلمة السر للأدمن:');
+    if (password === 'TeamMG@2024#SecureAdmin$789') {
         isAdminMode = true;
-        alert('✅ وضع الأدمن مفعل');
+        alert('✅ تم تفعيل وضع الأدمن!');
         displayFeedback();
     } else {
-        alert('❌ كلمة السر خاطئة');
+        alert('❌ كلمة السر غير صحيحة!');
     }
 }
 
+// ===== معالجات الأحداث =====
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('تحميل الصفحة...');
+    
+    // تحميل البيانات
     requestUserName();
     loadFeedback();
     displayFeedback();
     
-    // أزرار التقييم
-    document.querySelectorAll('.badge-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+    console.log('اسم المستخدم:', userName);
+    console.log('عدد الملاحظات:', allFeedback.length);
+    
+    // ===== أزرار التقييم =====
+    const badgeButtons = document.querySelectorAll('.badge-btn');
+    console.log('عدد أزرار التقييم:', badgeButtons.length);
+    
+    badgeButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             selectedRating = parseInt(this.getAttribute('data-rating'));
+            console.log('تم اختيار التقييم:', selectedRating);
             updateRatingDisplay();
         });
     });
     
-    // أزرار الرؤية
-    document.querySelectorAll('.visibility-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+    // ===== أزرار الرؤية =====
+    const visibilityButtons = document.querySelectorAll('.visibility-btn');
+    console.log('عدد أزرار الرؤية:', visibilityButtons.length);
+    
+    visibilityButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             selectedVisibility = this.getAttribute('data-visibility');
+            console.log('تم اختيار الرؤية:', selectedVisibility);
             updateVisibilityDisplay();
         });
     });
     
-    // زر الإرسال
+    // ===== زر الإرسال =====
     const submitBtn = document.getElementById('submitBtn');
+    console.log('زر الإرسال موجود:', !!submitBtn);
+    
     if (submitBtn) {
-        submitBtn.addEventListener('click', function() {
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('تم الضغط على زر الإرسال');
+            
             const text = document.getElementById('feedbackText').value.trim();
+            console.log('النص:', text);
             
             if (!text) {
-                alert('اكتب ملاحظة');
+                alert('❌ الرجاء كتابة ملاحظة');
                 return;
             }
             
             if (selectedRating === null) {
-                alert('اختر تقييم');
+                alert('❌ الرجاء اختيار تقييم');
                 return;
             }
             
             if (containsBannedWords(text)) {
-                alert('⚠️ كلمات محظورة');
+                alert('⚠️ تحتوي الملاحظة على كلمات محظورة أو روابط!');
                 return;
             }
             
             if (editingId !== null) {
-                const idx = allFeedback.findIndex(x => x.id === editingId);
-                if (idx !== -1) {
-                    allFeedback[idx].text = text;
-                    allFeedback[idx].rating = selectedRating;
-                    allFeedback[idx].visibility = selectedVisibility;
+                console.log('تحديث الملاحظة:', editingId);
+                const index = allFeedback.findIndex(f => f.id === editingId);
+                if (index !== -1) {
+                    allFeedback[index].text = text;
+                    allFeedback[index].rating = selectedRating;
+                    allFeedback[index].visibility = selectedVisibility;
                 }
                 editingId = null;
             } else {
+                console.log('إضافة ملاحظة جديدة');
                 allFeedback.push({
                     id: Date.now(),
                     text: text,
@@ -208,23 +268,31 @@ document.addEventListener('DOMContentLoaded', function() {
             saveFeedback();
             displayFeedback();
             
+            // مسح النموذج
             document.getElementById('feedbackText').value = '';
             selectedRating = null;
             selectedVisibility = 'public';
             updateRatingDisplay();
             updateVisibilityDisplay();
+            
+            alert('✅ تم إرسال الملاحظة بنجاح!');
         });
     }
     
-    // زر الأدمن
+    // ===== زر الأدمن =====
     const adminBtn = document.getElementById('adminBtn');
+    console.log('زر الأدمن موجود:', !!adminBtn);
+    
     if (adminBtn) {
-        adminBtn.addEventListener('click', function() {
+        adminBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('تم الضغط على زر الأدمن');
+            
             if (!isAdminMode) {
                 checkAdminPassword();
             } else {
                 isAdminMode = false;
-                alert('❌ وضع الأدمن معطل');
+                alert('❌ تم إيقاف وضع الأدمن!');
                 displayFeedback();
             }
         });

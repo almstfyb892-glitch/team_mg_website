@@ -79,12 +79,12 @@ function displayFeedback() {
         let buttonsHTML = '';
         if (isOwner) {
             buttonsHTML = `
-                <button onclick="editFeedbackItem(${feedback.id})" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px;">✏️ تعديل</button>
-                <button onclick="deleteFeedbackItem(${feedback.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
+                <button class="edit-btn" data-id="${feedback.id}" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px;">✏️ تعديل</button>
+                <button class="delete-btn" data-id="${feedback.id}" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
             `;
         } else if (isAdminMode) {
             buttonsHTML = `
-                <button onclick="deleteFeedbackItem(${feedback.id})" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
+                <button class="delete-btn" data-id="${feedback.id}" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ حذف</button>
             `;
         }
         
@@ -110,6 +110,21 @@ function displayFeedback() {
         `;
         
         container.appendChild(div);
+    });
+    
+    // Add event listeners to buttons
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            editFeedbackItem(id);
+        });
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            deleteFeedbackItem(id);
+        });
     });
 }
 
@@ -235,7 +250,7 @@ function submitFeedback() {
 }
 
 // ===== INITIALIZATION =====
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('Feedback script loaded');
     
     requestUserName();
